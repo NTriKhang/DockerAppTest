@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  dockerapp:
+    image: ${DOCKER_REGISTRY-}dockerapp
+    build:
+      context: .
+      dockerfile: DockerApp/Dockerfile
+    depends_on:
+     - "app_db"
+    container_name: dockerapp_services
+    ports:
+     - "8080:80"
+    expose:
+     - "80"
+    environment:
+     - ConnectionStrings__DefaultConnection=User Id=user;Password=user;Server=app_db;Port=3306;Database=KhangDocker;Pooling=true;
+     - ASPNETCORE_URLS=http://+:80
+  
+  app_db:
+    image: mysql:8.0
+    container_name: app_db
+    environment:
+     - MYSQL_USER=user
+     - MYSQL_PASSWORD=user
+     - MYSQL_DATABASE=KhangDocker
+     - MYSQL_ROOT_PASSWORD=root 
+    ports:
+     - "3307:3306"
+    restart: always
+    volumes:
+     - docker_app_volume:/var/lib/mysql
+  
+volumes:
+  docker_app_volume:
